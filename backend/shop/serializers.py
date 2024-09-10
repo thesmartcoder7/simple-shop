@@ -1,15 +1,22 @@
 from rest_framework import serializers
-from .models import Cart, CartItem, Order, OrderItem, Product, PartOption
+from .models import Product, PartType, PartOption, Cart, CartItem, Order, OrderItem
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'base_price']
+        fields = ['id', 'name', 'category', 'base_price']
 
 class PartOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PartOption
-        fields = ['id', 'name', 'price']
+        fields = ['id', 'name', 'price', 'in_stock']
+
+class PartTypeSerializer(serializers.ModelSerializer):
+    options = PartOptionSerializer(source='partoption_set', many=True, read_only=True)
+
+    class Meta:
+        model = PartType
+        fields = ['id', 'name', 'options']
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
