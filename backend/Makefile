@@ -23,4 +23,4 @@ langcheck:
 	@pycodestyle *.py
 
 test:
-	@python manage.py test
+	@pytest shop/tests.py 
