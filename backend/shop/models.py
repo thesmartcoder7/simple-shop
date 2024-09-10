@@ -88,7 +88,7 @@ class PriceRule(models.Model):
     price_adjustment = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"Price Rule: {self.price_adjustment}"
+        return f"Price Rule: {self.price_adjustment:.2f}"
 
     class Meta:
         verbose_name = "Price Rule"
