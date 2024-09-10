@@ -1,2 +1,5 @@
-# simple-shop
-Simple e-commerce site ( Factorial Assessment )
+# Robust Bicycle Shop
+
+Sample e-commerce shop django project
+
+- [ERD](documentation/ERD.md)
