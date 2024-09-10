@@ -21,3 +21,6 @@ dependencies:
 
 langcheck:
 	@pycodestyle *.py
+
+test:
+	@python manage.py test
