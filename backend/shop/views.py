@@ -2,9 +2,17 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
 from .models import Product, PartType, PartOption, PriceRule, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, PartTypeSerializer, CartSerializer, OrderSerializer
 from decimal import Decimal
+
+class ProductListView(ListAPIView):
+    """
+    API view to retrieve a list of all products
+    """
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 class ProductDetailView(APIView):
     """
