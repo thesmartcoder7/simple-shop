@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Product, PartType, PartOption, PriceRule, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, PartTypeSerializer, CartSerializer, OrderSerializer
+from decimal import Decimal
 
 class ProductDetailView(APIView):
     """
@@ -58,22 +59,22 @@ class AddToCartView(APIView):
     def post(self, request):
         product_id = request.data['product_id']
         selected_option_ids = request.data['selected_options']
-        quantity = request.data.get('quantity', 1)
+        quantity = int(request.data.get('quantity', 1))  # Ensure quantity is an integer
 
         try:
             product = Product.objects.get(id=product_id)
             selected_options = PartOption.objects.filter(id__in=selected_option_ids)
 
             # Calculate price
-            total_price = product.base_price
+            total_price = Decimal(product.base_price)  # Convert to Decimal
             for option in selected_options:
-                total_price += option.price
+                total_price += Decimal(option.price)  # Convert to Decimal
 
             # Apply price rules
             price_rules = PriceRule.objects.filter(part_options__in=selected_options).distinct()
             for rule in price_rules:
                 if set(rule.part_options.all()).issubset(set(selected_options)):
-                    total_price += rule.price_adjustment
+                    total_price += Decimal(rule.price_adjustment)  # Convert to Decimal
 
             # Get or create cart
             cart, _ = Cart.objects.get_or_create(user=request.user)
