@@ -23,4 +23,7 @@ langcheck:
 	@pycodestyle *.py
 
 test:
-	@pytest shop/tests.py 
+	@pytest shop/tests.py
+
+dummy:
+	@python manage.py populate_db
