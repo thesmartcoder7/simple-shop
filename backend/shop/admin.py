@@ -1,23 +1,43 @@
 from django.contrib import admin
-from .models import *
+from .models import Category, Product, PartType, PartOption, Incompatibility, PriceRule, Order, OrderItem
 
-# Inline for VariationOption within VariationType
-class VariationOptionInline(admin.TabularInline):  # or StackedInline for a different layout
-    model = VariationOption
-    extra = 1  # Number of extra blank rows for new options
-    min_num = 1  # Ensures at least one option is present
-    fields = ['option_name', 'price_change']  # Fields to display for each option
+class PartOptionInline(admin.TabularInline):
+    model = PartOption
+    extra = 1
 
-# VariationType Admin with Inline for VariationOption
-@admin.register(VariationType)
-class VariationTypeAdmin(admin.ModelAdmin):
-    inlines = [VariationOptionInline]
-    list_display = ['variation_name']  # Displays the variation type name
-    search_fields = ['variation_name']  # Allows searching for variation types by name
+class PartTypeInline(admin.TabularInline):
+    model = PartType
+    extra = 1
+    inlines = [PartOptionInline]
+
+class ProductAdmin(admin.ModelAdmin):
+    inlines = [PartTypeInline]
+    list_display = ('name', 'category', 'base_price')
+    list_filter = ('category',)
+    search_fields = ('name',)
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('product', 'selected_options', 'quantity', 'price')
+
+class OrderAdmin(admin.ModelAdmin):
+    inlines = [OrderItemInline]
+    list_display = ('id', 'user', 'status', 'total_price', 'created_at')
+    list_filter = ('status',)
+    search_fields = ('user__username',)
+
+class IncompatibilityAdmin(admin.ModelAdmin):
+    list_display = ('part_option_1', 'part_option_2')
+
+class PriceRuleAdmin(admin.ModelAdmin):
+    filter_horizontal = ('part_options',)
+    list_display = ('id', 'price_adjustment')
 
 admin.site.register(Category)
-admin.site.register(Product)
-admin.site.register(VariationOption)
-admin.site.register(ProductItem)
-admin.site.register(ProductVariation)
-
+admin.site.register(Product, ProductAdmin)
+admin.site.register(PartType)
+admin.site.register(PartOption)
+admin.site.register(Incompatibility, IncompatibilityAdmin)
+admin.site.register(PriceRule, PriceRuleAdmin)
+admin.site.register(Order, OrderAdmin)
