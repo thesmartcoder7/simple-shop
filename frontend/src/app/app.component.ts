@@ -6,9 +6,12 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  template: `
+    <nav>
+      <a routerLink="/products">Products</a> |
+      <a routerLink="/cart">Cart</a>
+    </nav>
+    <router-outlet></router-outlet>
+  `
 })
-export class AppComponent {
-  title = 'frontend';
-}
+export class AppComponent { }
