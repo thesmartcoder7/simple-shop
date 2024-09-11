@@ -2,7 +2,7 @@ build:
 	@docker-compose up --build
 
 tests:
-	@docker-compose run backend python manage.py test
+	@docker-compose run backend make test
 
 stop:
 	@docker-compose down

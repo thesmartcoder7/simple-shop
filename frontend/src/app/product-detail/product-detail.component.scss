@@ -1,17 +1,24 @@
-.parts {
-  margin-top: 1vw;
-  select {
-    padding: 0.5vw 1vw;
-    option {
-      padding: 0.5vw 0;
+.container {
+  padding: 2vw 10vw;
+  .parts {
+    margin-top: 1vw;
+    display: flex;
+    align-items: center;
+    select {
+      padding: 0.3vw 1vw;
+      margin-left: 2vw;
+      border-radius: 0.3vw;
+      option {
+        padding: 0.5vw 0;
+      }
     }
   }
-}
 
-.total {
-  margin: 1.5vw 0;
-}
+  .total {
+    margin: 1.5vw 0;
+  }
 
-.add_to_cart {
-  padding: 1vw 2vw;
+  .add_to_cart {
+    padding: 1vw 2vw;
+  }
 }

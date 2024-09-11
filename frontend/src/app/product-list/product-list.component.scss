@@ -5,11 +5,9 @@ ul {
   align-items: flex-start;
   justify-content: flex-start;
   padding: 1vw 0;
+  width: 100%;
   li {
-    border: 0.1vw solid black;
-    margin: 1vw 0;
-    display: inline-block;
-    margin-right: 1vw;
+    width: inherit;
     a {
       display: inherit;
       text-decoration: none;
