@@ -1,17 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
-  template: `
-    <nav>
-      <a routerLink="/products">Products</a> |
-      <a routerLink="/cart">Cart</a>
-    </nav>
-    <router-outlet></router-outlet>
-  `
+  imports: [CommonModule, RouterOutlet, RouterLink],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent { }
+export class AppComponent {}

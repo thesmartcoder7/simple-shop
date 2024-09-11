@@ -7,14 +7,8 @@ import { ProductService } from '../product.service';
   selector: 'app-product-list',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  template: `
-    <h2>Products</h2>
-    <ul>
-      <li *ngFor="let product of products">
-        <a [routerLink]="['/product', product.id]">{{ product.name }}</a>
-      </li>
-    </ul>
-  `,
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent implements OnInit {
   products: any[] = [];
