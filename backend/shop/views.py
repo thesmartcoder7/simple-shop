@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import ListAPIView
 from .models import Product, PartType, PartOption, PriceRule, Cart, CartItem, Order, OrderItem
 from .serializers import ProductSerializer, PartTypeSerializer, CartSerializer, OrderSerializer
@@ -11,6 +11,7 @@ class ProductListView(ListAPIView):
     """
     API view to retrieve a list of all products
     """
+    permission_classes = [AllowAny]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -18,6 +19,7 @@ class ProductDetailView(APIView):
     """
     API view to retrieve details of a specific product
     """
+    permission_classes = [AllowAny]
     def get(self, request, product_id):
         try:
             product = Product.objects.get(id=product_id)
