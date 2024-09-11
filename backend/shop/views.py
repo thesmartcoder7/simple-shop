@@ -123,18 +123,6 @@ class AddToCartView(BaseView):
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# class CartView(BaseView):
-#     permission_classes = [AllowAny]
-
-#     def get(self, request):
-#         session_key = request.session.session_key
-#         if not session_key:
-#             request.session.create()
-#             session_key = request.session.session_key
-
-#         cart, _ = Cart.objects.get_or_create(session_key=session_key)
-#         serializer = CartSerializer(cart)
-#         return Response(serializer.data)
 class CartView(APIView):
     permission_classes = [AllowAny]
 
@@ -181,11 +169,3 @@ class CreateOrderView(APIView):
 
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-# class OrderListView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         orders = Order.objects.filter(user=request.user).order_by('-created_at')
-#         serializer = OrderSerializer(orders, many=True)
-#         return Response(serializer.data)
