@@ -33,7 +33,9 @@ The system uses session-based authentication to manage shopping carts and orders
 The frontend is built using Angular 18.
 
 - [ERD](documentation/ERD.md)
-- [Installation](#Installation)
+
+- [Installation](#installation)
+
 - [Description](documentation/description.md)
 
 ## Installation
@@ -59,4 +61,3 @@ docker-compose down # to stop the application form running.
 If you run into any errors while running these commands, you might need root persmissions in case you installed docker and docker compose with super user.
 
 Keep in mind that the required dependencies for this project are in their respective folders `frontend` i.e `package.json` and `backend` i.e `requirements.txt` . . . but that is why I decided to use Docker to setup the project with the build command and expose both the frontend and the backend.
-

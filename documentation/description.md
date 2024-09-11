@@ -9,8 +9,6 @@ The product page is primarily handled by the `ProductDetailView` in `views.py`.
 - **Endpoint**: GET `/api/products/<product_id>/`
 - **View**: `ProductDetailView`
 
-#### Process
-
 1. Retrieves the specific product based on the `product_id`.
 2. Fetches all `PartType` objects associated with this product.
 3. Returns a response containing the serialized product data and its associated part types.
