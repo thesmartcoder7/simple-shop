@@ -4,14 +4,12 @@
 
 The product page is a crucial component of our e-commerce platform, allowing customers to view and customize products before adding them to their cart.
 
-### Functionality
-
 The product page is primarily handled by the `ProductDetailView` in `views.py`.
 
 - **Endpoint**: GET `/api/products/<product_id>/`
 - **View**: `ProductDetailView`
 
-#### Process:
+#### Process
 
 1. Retrieves the specific product based on the `product_id`.
 2. Fetches all `PartType` objects associated with this product.
@@ -35,8 +33,6 @@ Price calculation is handled by the `CalculatePriceView`.
 - **Endpoint**: POST `/api/calculate-price/`
 - **View**: `CalculatePriceView`
 
-#### Process:
-
 1. Receives the product ID and selected option IDs.
 2. Calculates the total price based on:
    - Product's base price
@@ -48,14 +44,10 @@ Price calculation is handled by the `CalculatePriceView`.
 
 The "Add to Cart" functionality allows users to add customized products to their shopping cart.
 
-### Functionality
-
 Handled by the `AddToCartView` in `views.py`.
 
 - **Endpoint**: POST `/api/add-to-cart/`
 - **View**: `AddToCartView`
-
-#### Process:
 
 1. Receives a POST request with product ID, selected option IDs, and quantity.
 2. Retrieves or creates a session key for the user.
