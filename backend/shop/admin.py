@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, PartType, PartOption, Incompatibility, PriceRule, Order, OrderItem
+from .models import *
 
 class PartOptionInline(admin.TabularInline):
     model = PartOption
@@ -41,3 +41,5 @@ admin.site.register(PartOption)
 admin.site.register(Incompatibility, IncompatibilityAdmin)
 admin.site.register(PriceRule, PriceRuleAdmin)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(CartItem)
+admin.site.register(Cart)
