@@ -1,5 +1,7 @@
 <div class="container" *ngIf="data">
-  <h2 class="text-3xl font-bold text-left mb-5">{{ data.product.name }}</h2>
+  <h2 class="text-3xl font-bold text-left mb-5">
+    Product: {{ data.product.name }}
+  </h2>
   <p class="text-xl font-bold">
     Base Price: {{ data.product.base_price | currency }}
   </p>

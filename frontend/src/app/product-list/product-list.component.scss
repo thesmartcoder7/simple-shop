@@ -1,20 +1,25 @@
-ul {
-  list-style-type: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 1vw 0;
+.container {
   width: 100%;
-  li {
-    width: inherit;
-    a {
-      display: inherit;
-      text-decoration: none;
-      padding: 0.5vw 1vw;
-      color: black;
-      &:hover {
-        color: gray;
+  padding: 2vw 5vw;
+  margin: 0 auto;
+  ul {
+    list-style-type: none;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    li {
+      width: inherit;
+      margin: 1vw 0;
+      a {
+        display: inherit;
+        text-decoration: none;
+        padding: 0.5vw 1vw;
+        color: black;
+        &:hover {
+          color: gray;
+        }
       }
     }
   }
