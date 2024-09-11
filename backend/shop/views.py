@@ -122,7 +122,6 @@ class AddToCartView(BaseView):
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
 class CartView(APIView):
     permission_classes = [AllowAny]
 
