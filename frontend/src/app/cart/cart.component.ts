@@ -6,27 +6,8 @@ import { CartService } from '../cart.service';
   selector: 'app-cart',
   standalone: true,
   imports: [CommonModule, CurrencyPipe],
-  template: `
-    <h2>Your Cart</h2>
-    <ul>
-      <li *ngFor="let item of cartItems">
-        <strong>{{ item.product.name }}</strong> - {{ item.price | currency }}
-        <br />
-        <em>Category: {{ item.product.category.name }}</em>
-        <br />
-        Base Price: {{ item.product.base_price | currency }}
-        <ul>
-          <li *ngFor="let option of item.selected_options">
-            {{ option.name }} - {{ option.price | currency }}
-          </li>
-        </ul>
-        <p>Quantity: {{ item.quantity }}</p>
-      </li>
-    </ul>
-
-    <p>Total:{{ cartItems[0].price | currency }}</p>
-    <button (click)="checkout()">Checkout</button>
-  `,
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent implements OnInit {
   cartItems: any[] = [];

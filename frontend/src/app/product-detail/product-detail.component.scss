@@ -20,6 +20,16 @@
     font-weight: bold;
   }
 
+  .quantity {
+    border-radius: 0.3vw;
+    margin: 1vw 0;
+    input {
+      margin-left: 0.5vw;
+      background-color: #efefef;
+      padding: 0.3vw 1vw;
+    }
+  }
+
   .add_to_cart {
     padding: 1vw 2vw;
   }
