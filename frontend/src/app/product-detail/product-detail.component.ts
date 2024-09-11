@@ -19,7 +19,8 @@ export class ProductDetailComponent implements OnInit {
 
   data: any;
   selectedOptions: { [key: number]: number } = {};
-  totalPrice: number = 0;
+  quantity: number = 1; // Default quantity
+  totalPrice: number = 0; // Default total price
 
   ngOnInit() {
     const productId = Number(this.route.snapshot.paramMap.get('id'));
@@ -33,6 +34,16 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  getSelectedOptions(): number[] {
+    const selectedOptionsArray: number[] = [];
+    for (const partTypeId in this.selectedOptions) {
+      if (this.selectedOptions.hasOwnProperty(partTypeId)) {
+        selectedOptionsArray.push(this.selectedOptions[partTypeId]);
+      }
+    }
+    return selectedOptionsArray;
+  }
+
   updatePrice() {
     const selectedOptionIds = Object.values(this.selectedOptions);
     this.productService
@@ -43,12 +54,10 @@ export class ProductDetailComponent implements OnInit {
       });
   }
 
-  addToCart() {
-    this.cartService
-      .addToCart(this.data.product.id, Object.values(this.selectedOptions))
-      .subscribe({
-        next: () => console.log('Added to cart'),
-        error: (error) => console.error('Error adding to cart:', error),
-      });
+  addToCart(productId: number, selectedOptions: number[], quantity: number) {
+    this.cartService.addToCart(productId, selectedOptions, quantity).subscribe({
+      next: () => console.log('Added to cart'),
+      error: (error) => console.error('Error adding to cart:', error),
+    });
   }
 }

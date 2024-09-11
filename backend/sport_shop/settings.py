@@ -56,6 +56,18 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True  # Allow requests from all domains
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-session-key',  # Add this line to allow the custom header
+]
 
 ROOT_URLCONF = 'sport_shop.urls'
 

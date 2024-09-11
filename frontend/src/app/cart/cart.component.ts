@@ -10,10 +10,21 @@ import { CartService } from '../cart.service';
     <h2>Your Cart</h2>
     <ul>
       <li *ngFor="let item of cartItems">
-        {{ item.product.name }} - {{ item.price | currency }}
+        <strong>{{ item.product.name }}</strong> - {{ item.price | currency }}
+        <br />
+        <em>Category: {{ item.product.category.name }}</em>
+        <br />
+        Base Price: {{ item.product.base_price | currency }}
+        <ul>
+          <li *ngFor="let option of item.selected_options">
+            {{ option.name }} - {{ option.price | currency }}
+          </li>
+        </ul>
+        <p>Quantity: {{ item.quantity }}</p>
       </li>
     </ul>
-    <p>Total: {{ total | currency }}</p>
+
+    <p>Total:{{ cartItems[0].price | currency }}</p>
     <button (click)="checkout()">Checkout</button>
   `,
 })
@@ -24,27 +35,22 @@ export class CartComponent implements OnInit {
   constructor(private cartService: CartService) {}
 
   ngOnInit() {
-    this.loadCart();
-  }
-
-  loadCart() {
-    this.cartService.getCart().subscribe({
-      next: (data) => {
-        this.cartItems = data.items;
-        this.total = data.items.reduce(
-          (sum: number, item: any) => sum + item.price,
-          0
-        );
+    this.cartService.getCart().subscribe(
+      (cart) => {
+        this.cartItems = cart.items;
+        console.log(this.cartItems);
       },
-      error: (error) => console.error('Error fetching cart:', error),
-    });
+      (error) => {
+        console.error('Error fetching cart:', error);
+        // Handle error
+      }
+    );
   }
 
   checkout() {
     this.cartService.createOrder().subscribe({
       next: () => {
         console.log('Order created');
-        this.loadCart(); // Refresh cart after order creation
       },
       error: (error) => console.error('Error creating order:', error),
     });

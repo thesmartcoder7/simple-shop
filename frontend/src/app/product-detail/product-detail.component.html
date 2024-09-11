@@ -5,6 +5,8 @@
   <p class="text-xl font-bold">
     Base Price: {{ data.product.base_price | currency }}
   </p>
+
+  <!-- Part Types and Options -->
   <div *ngFor="let partType of data.part_types" class="parts">
     <h3>{{ partType.name }}</h3>
     <select [(ngModel)]="selectedOptions[partType.id]" (change)="updatePrice()">
@@ -13,11 +15,27 @@
       </option>
     </select>
   </div>
+
+  <!-- Quantity Selection -->
+  <div class="quantity">
+    <label for="quantity">Quantity:</label>
+    <input
+      type="number"
+      id="quantity"
+      name="quantity"
+      [(ngModel)]="quantity"
+      min="1"
+      class="quantity-input"
+    />
+  </div>
+
+  <!-- Total Price -->
   <p class="total">Total Price: {{ totalPrice | currency }}</p>
+
+  <!-- Add to Cart Button -->
   <button
-    class="add_to_cart"
     class="bg-blue-500 text-white py-2 px-4 rounded"
-    (click)="addToCart()"
+    (click)="addToCart(data.product.id, getSelectedOptions(), quantity)"
   >
     Add to Cart
   </button>

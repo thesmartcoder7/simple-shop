@@ -1,11 +1,22 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.generics import ListAPIView
-from .models import Product, PartType, PartOption, PriceRule, Cart, CartItem, Order, OrderItem
-from .serializers import ProductSerializer, PartTypeSerializer, CartSerializer, OrderSerializer
+from .models import *
+from .serializers import *
 from decimal import Decimal
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
+
+class BaseView(APIView):
+    def get_session_key(self, request):
+        session_key = request.META.get('HTTP_X_SESSION_KEY')
+        if session_key:
+            session = SessionStore(session_key=session_key)
+            if session.exists(session_key):
+                return session_key
+        return request.session.session_key or request.session.create()
 
 class ProductListView(ListAPIView):
     """
@@ -63,31 +74,37 @@ class CalculatePriceView(APIView):
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
-class AddToCartView(APIView):
-    permission_classes = [IsAuthenticated]
+class AddToCartView(BaseView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
+        session_key = self.get_session_key(request)
         product_id = request.data['product_id']
         selected_option_ids = request.data['selected_options']
-        quantity = int(request.data.get('quantity', 1))  # Ensure quantity is an integer
+        quantity = int(request.data.get('quantity', 1))
 
         try:
             product = Product.objects.get(id=product_id)
             selected_options = PartOption.objects.filter(id__in=selected_option_ids)
 
             # Calculate price
-            total_price = Decimal(product.base_price)  # Convert to Decimal
+            total_price = Decimal(product.base_price)
             for option in selected_options:
-                total_price += Decimal(option.price)  # Convert to Decimal
+                total_price += Decimal(option.price)
 
             # Apply price rules
             price_rules = PriceRule.objects.filter(part_options__in=selected_options).distinct()
             for rule in price_rules:
                 if set(rule.part_options.all()).issubset(set(selected_options)):
-                    total_price += Decimal(rule.price_adjustment)  # Convert to Decimal
+                    total_price += Decimal(rule.price_adjustment)
 
             # Get or create cart
-            cart, _ = Cart.objects.get_or_create(user=request.user)
+            session_key = request.session.session_key
+            if not session_key:
+                request.session.create()
+                session_key = request.session.session_key
+
+            cart, _ = Cart.objects.get_or_create(session_key=session_key)
 
             # Create cart item
             cart_item = CartItem.objects.create(
@@ -98,32 +115,56 @@ class AddToCartView(APIView):
             )
             cart_item.selected_options.set(selected_options)
 
-            return Response({'success': True}, status=status.HTTP_201_CREATED)
+            return Response({
+            'success': True,
+            'session_key': session_key
+        }, status=status.HTTP_201_CREATED)
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+# class CartView(BaseView):
+#     permission_classes = [AllowAny]
+
+#     def get(self, request):
+#         session_key = request.session.session_key
+#         if not session_key:
+#             request.session.create()
+#             session_key = request.session.session_key
+
+#         cart, _ = Cart.objects.get_or_create(session_key=session_key)
+#         serializer = CartSerializer(cart)
+#         return Response(serializer.data)
 class CartView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        cart, _ = Cart.objects.get_or_create(user=request.user)
+        session_key = request.META.get('HTTP_X_SESSION_KEY') or request.session.session_key
+        if not session_key:
+            session_key = request.session.create()
+
+        cart, _ = Cart.objects.get_or_create(session_key=session_key)
         serializer = CartSerializer(cart)
         return Response(serializer.data)
 
 class CreateOrderView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        cart, _ = Cart.objects.get_or_create(user=request.user)
-        
-        if not cart.items.exists():
+        session_key = request.META.get('HTTP_X_SESSION_KEY') or request.session.session_key
+        if not session_key:
+            return Response({'error': 'No active session'}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart = Cart.objects.filter(session_key=session_key).first()
+        if not cart or not cart.items.exists():
             return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
 
         total_price = sum(item.price for item in cart.items.all())
         
         order = Order.objects.create(
-            user=request.user,
-            total_price=total_price
+            session_key=session_key,
+            total_price=total_price,
+            status=Order.PENDING
         )
 
         for cart_item in cart.items.all():
@@ -136,15 +177,15 @@ class CreateOrderView(APIView):
             order_item.selected_options.set(cart_item.selected_options.all())
 
         # Clear the cart
-        cart.items.all().delete()
+        cart.delete()
 
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class OrderListView(APIView):
-    permission_classes = [IsAuthenticated]
+# class OrderListView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        orders = Order.objects.filter(user=request.user).order_by('-created_at')
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+#     def get(self, request):
+#         orders = Order.objects.filter(user=request.user).order_by('-created_at')
+#         serializer = OrderSerializer(orders, many=True)
+#         return Response(serializer.data)

@@ -21,4 +21,5 @@ export class ProductService {
   calculatePrice(productId: number, selectedOptions: number[]): Observable<any> {
     return this.http.post(`${this.apiUrl}/calculate-price/`, { product_id: productId, selected_options: selectedOptions });
   }
+
 }

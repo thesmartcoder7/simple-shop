@@ -1,30 +1,70 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CartService {
   private apiUrl = 'http://localhost:8000/api';
+  private sessionKey: string | null = null;
+  router: any;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient) {
+    this.sessionKey = localStorage.getItem('sessionKey');
+  }
 
-  addToCart(productId: number, selectedOptions: number[]): Observable<any> {
-    return this.http.post(`${this.apiUrl}/add-to-cart/`, { product_id: productId, selected_options: selectedOptions })
-      .pipe(catchError(this.handleError.bind(this)));
+  private getHeaders(): HttpHeaders {
+    let headers = new HttpHeaders();
+    if (this.sessionKey) {
+      headers = headers.set('X-Session-Key', this.sessionKey);
+    }
+    return headers;
+  }
+
+  addToCart(
+    productId: number,
+    selectedOptions: number[],
+    quantity: number
+  ): Observable<any> {
+    const url = `${this.apiUrl}/add-to-cart/`;
+    const body = {
+      product_id: productId,
+      selected_options: selectedOptions,
+      quantity,
+    };
+    return this.http.post(url, body, { headers: this.getHeaders() }).pipe(
+      tap((response: any) => {
+        if (response.session_key) {
+          this.sessionKey = response.session_key;
+          localStorage.setItem('sessionKey', response.session_key);
+        }
+      })
+    );
   }
 
   getCart(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/cart/`)
-      .pipe(catchError(this.handleError.bind(this)));
+    const url = `${this.apiUrl}/cart/`;
+    return this.http.get(url, { headers: this.getHeaders() });
   }
 
   createOrder(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create-order/`, {})
-      .pipe(catchError(this.handleError.bind(this)));
+    return this.http
+      .post(`${this.apiUrl}/create-order/`, {}, { headers: this.getHeaders() })
+      .pipe(
+        tap((response: any) => {
+          if (response.session_key) {
+            this.sessionKey = response.session_key;
+            localStorage.setItem('sessionKey', response.session_key);
+          }
+        })
+      );
   }
 
   private handleError(error: HttpErrorResponse): Observable<any> {
