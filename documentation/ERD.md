@@ -2,99 +2,143 @@
 
 Here's the simple ERD
 
-![ERD Image](../images/shop_with_users.png)
+![ERD Image](../images/erd.png)
 
 Here's a detailed description of the entities and their relationships:
 
-1. User (Django's built-in User model)
+## Entities (Tables)
 
-   - Fields: id, username, email, password, etc.
-   - Relationships:
-     - One-to-Many with Order
-     - One-to-One with Cart
+### Category
 
-2. Category
+- **id**: integer (primary key)
+- **name**: varchar
 
-   - Fields: id, name
-   - Relationships:
-     -One-to-Many with Product
+### Product
 
-3. Product
+- **id**: integer (primary key)
+- **name**: varchar
+- **category_id**: integer (foreign key to Category)
+- **base_price**: decimal
 
-   - Fields: id, name, base_price
-   - Relationships:
-     - Many-to-One with Category
-     - One-to-Many with PartType
+### PartType
 
-4. PartType
+- **id**: integer (primary key)
+- **name**: varchar
+- **product_id**: integer (foreign key to Product)
 
-   - Fields: id, name
-   - Relationships:
-     - Many-to-One with Product
-     - One-to-Many with PartOption
+### PartOption
 
-5. PartOption
+- **id**: integer (primary key)
+- **name**: varchar
+- **part_type_id**: integer (foreign key to PartType)
+- **price**: decimal
+- **in_stock**: boolean
 
-   - Fields: id, name, price, in_stock
-   - Relationships:
-     - Many-to-One with PartType
-     - Many-to-Many with PriceRule
-     - Many-to-Many with OrderItem
-     - Many-to-Many with CartItem
+### Incompatibility
 
-6. Incompatibility
+- **id**: integer (primary key)
+- **part_option_1_id**: integer (foreign key to PartOption)
+- **part_option_2_id**: integer (foreign key to PartOption)
 
-   - Fields: id
-   - Relationships:
-     - Many-to-One with PartOption (twice, as part_option_1 and part_option_2)
+### PriceRule
 
-7. PriceRule
+- **id**: integer (primary key)
+- **price_adjustment**: decimal
 
-   - Fields: id, price_adjustment
-   - Relationships:
-     -Many-to-Many with PartOption
+### PriceRulePartOption (Junction Table)
 
-8. Order
+- **price_rule_id**: integer (foreign key to PriceRule)
+- **part_option_id**: integer (foreign key to PartOption)
 
-   - Fields: id, created_at, updated_at, status, total_price
-   - Relationships:
-     - Many-to-One with User
-     - One-to-Many with OrderItem
+### Order
 
-9. OrderItem
+- **id**: integer (primary key)
+- **session_key**: varchar
+- **created_at**: timestamp
+- **updated_at**: timestamp
+- **status**: varchar
+- **total_price**: decimal
 
-   - Fields: id, quantity, price
-   - Relationships:
-     - Many-to-One with Order
-     - Many-to-One with Product
-     - Many-to-Many with PartOption
+### OrderItem
 
-10. Cart
+- **id**: integer (primary key)
+- **order_id**: integer (foreign key to Order)
+- **product_id**: integer (foreign key to Product)
+- **quantity**: integer
+- **price**: decimal
 
-    - Fields: id, created_at, updated_at
-    - Relationships:
-      - One-to-One with User
-      - One-to-Many with CartItem
+### OrderItemPartOption (Junction Table)
 
-11. CartItem
-    - Fields: id, quantity, price
-    - Relationships:
-      - Many-to-One with Cart
-      - Many-to-One with Product
-      - Many-to-Many with PartOption
+- **order_item_id**: integer (foreign key to OrderItem)
+- **part_option_id**: integer (foreign key to PartOption)
 
-Key Relationships:
+### Cart
 
-- Products are categorized and can have multiple customizable part types.
+- **id**: integer (primary key)
+- **session_key**: varchar
+- **created_at**: timestamp
+- **updated_at**: timestamp
 
-- Each part type has multiple options, which have individual prices.
+### CartItem
 
-- Incompatibilities between part options are tracked.
+- **id**: integer (primary key)
+- **cart_id**: integer (foreign key to Cart)
+- **product_id**: integer (foreign key to Product)
+- **quantity**: integer
+- **price**: decimal
 
-- Price rules can adjust the final price based on combinations of part options.
+### CartItemPartOption (Junction Table)
 
-- Users can have a cart with multiple items, each representing a product with selected options.
+- **cart_item_id**: integer (foreign key to CartItem)
+- **part_option_id**: integer (foreign key to PartOption)
 
-- Orders consist of multiple order items, each representing a product with selected options.
+## Relationships
 
-This ERD represents a flexible system for customizable products, with features for pricing rules, incompatibilities, and order management. It allows for complex product configurations while maintaining a clear structure for order processing and inventory management.
+1. **Category - Product**: One-to-Many
+   - A Category can have multiple Products
+   - A Product belongs to one Category
+
+2. **Product - PartType**: One-to-Many
+   - A Product can have multiple PartTypes
+   - A PartType belongs to one Product
+
+3. **PartType - PartOption**: One-to-Many
+   - A PartType can have multiple PartOptions
+   - A PartOption belongs to one PartType
+
+4. **PartOption - Incompatibility**: Many-to-Many
+   - A PartOption can be incompatible with multiple other PartOptions
+   - An Incompatibility record links two PartOptions
+
+5. **PartOption - PriceRule**: Many-to-Many
+   - A PartOption can be associated with multiple PriceRules
+   - A PriceRule can apply to multiple PartOptions
+   - This relationship is implemented through the PriceRulePartOption junction table
+
+6. **Order - OrderItem**: One-to-Many
+   - An Order can have multiple OrderItems
+   - An OrderItem belongs to one Order
+
+7. **OrderItem - Product**: Many-to-One
+   - An OrderItem is associated with one Product
+   - A Product can be in multiple OrderItems
+
+8. **OrderItem - PartOption**: Many-to-Many
+   - An OrderItem can have multiple PartOptions
+   - A PartOption can be in multiple OrderItems
+   - This relationship is implemented through the OrderItemPartOption junction table
+
+9. **Cart - CartItem**: One-to-Many
+   - A Cart can have multiple CartItems
+   - A CartItem belongs to one Cart
+
+10. **CartItem - Product**: Many-to-One
+    - A CartItem is associated with one Product
+    - A Product can be in multiple CartItems
+
+11. **CartItem - PartOption**: Many-to-Many
+    - A CartItem can have multiple PartOptions
+    - A PartOption can be in multiple CartItems
+    - This relationship is implemented through the CartItemPartOption junction table
+
+This ERD represents a complex e-commerce system for customizable products (like bicycles). It allows for product categorization, customizable parts, pricing rules, incompatibility checks, and both cart and order management. The use of junction tables (PriceRulePartOption, OrderItemPartOption, CartItemPartOption) enables flexible many-to-many relationships between entities.
