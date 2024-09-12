@@ -74,6 +74,53 @@ class CalculatePriceView(APIView):
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
+# class AddToCartView(BaseView):
+#     permission_classes = [AllowAny]
+
+#     def post(self, request):
+#         session_key = self.get_session_key(request)
+#         product_id = request.data['product_id']
+#         selected_option_ids = request.data['selected_options']
+#         quantity = int(request.data.get('quantity', 1))
+
+#         try:
+#             product = Product.objects.get(id=product_id)
+#             selected_options = PartOption.objects.filter(id__in=selected_option_ids)
+
+#             # Calculate price
+#             total_price = Decimal(product.base_price)
+#             for option in selected_options:
+#                 total_price += Decimal(option.price)
+
+#             # Apply price rules
+#             price_rules = PriceRule.objects.filter(part_options__in=selected_options).distinct()
+#             for rule in price_rules:
+#                 if set(rule.part_options.all()).issubset(set(selected_options)):
+#                     total_price += Decimal(rule.price_adjustment)
+
+#             # Get or create cart
+#             session_key = request.session.session_key
+#             if not session_key:
+#                 request.session.create()
+#                 session_key = request.session.session_key
+
+#             cart, _ = Cart.objects.get_or_create(session_key=session_key)
+
+#             # Create cart item
+#             cart_item = CartItem.objects.create(
+#                 cart=cart,
+#                 product=product,
+#                 quantity=quantity,
+#                 price=total_price * quantity
+#             )
+#             cart_item.selected_options.set(selected_options)
+
+#             return Response({
+#             'success': True,
+#             'session_key': session_key
+#         }, status=status.HTTP_201_CREATED)
+#         except Product.DoesNotExist:
+#             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 class AddToCartView(BaseView):
     permission_classes = [AllowAny]
 
@@ -99,26 +146,39 @@ class AddToCartView(BaseView):
                     total_price += Decimal(rule.price_adjustment)
 
             # Get or create cart
-            session_key = request.session.session_key
-            if not session_key:
-                request.session.create()
-                session_key = request.session.session_key
-
             cart, _ = Cart.objects.get_or_create(session_key=session_key)
 
-            # Create cart item
-            cart_item = CartItem.objects.create(
+            # Check if the item already exists in the cart
+            existing_item = CartItem.objects.filter(
                 cart=cart,
                 product=product,
-                quantity=quantity,
-                price=total_price * quantity
-            )
-            cart_item.selected_options.set(selected_options)
+                selected_options__in=selected_options
+            ).annotate(
+                option_count=models.Count('selected_options')
+            ).filter(
+                option_count=len(selected_options)
+            ).first()
+
+            if existing_item:
+                # Update existing item
+                existing_item.quantity += quantity
+                existing_item.price += total_price * quantity
+                existing_item.save()
+                cart_item = existing_item
+            else:
+                # Create new cart item
+                cart_item = CartItem.objects.create(
+                    cart=cart,
+                    product=product,
+                    quantity=quantity,
+                    price=total_price * quantity
+                )
+                cart_item.selected_options.set(selected_options)
 
             return Response({
-            'success': True,
-            'session_key': session_key
-        }, status=status.HTTP_201_CREATED)
+                'success': True,
+                'session_key': session_key
+            }, status=status.HTTP_201_CREATED)
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 

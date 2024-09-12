@@ -11,7 +11,7 @@ import { CartService } from '../cart.service';
 })
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
-  total: number = 0;
+  total: any = 0.0;
 
   constructor(private cartService: CartService) {}
 
@@ -19,7 +19,11 @@ export class CartComponent implements OnInit {
     this.cartService.getCart().subscribe(
       (cart) => {
         this.cartItems = cart.items;
-        console.log(this.cartItems);
+        this.cartItems.forEach((item) => {
+          console.log(item.price);
+          this.total += parseFloat(item.price);
+        });
+        console.log(this.cartItems)
       },
       (error) => {
         console.error('Error fetching cart:', error);

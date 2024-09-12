@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
   <h2 class="text-3xl font-bold text-left mb-5">Your Cart</h2>
   @if(cartItems.length > 0){
   <ul>
@@ -18,7 +18,7 @@
     </li>
   </ul>
   <br />
-  <p class="text-xl font-bold">Total:{{ cartItems[0].price | currency }}</p>
+  <p class="text-xl font-bold">Total:{{ total | currency }}</p>
   <br />
   <button class="bg-blue-500 text-white py-2 px-4 rounded" (click)="checkout()">
     Checkout
@@ -26,4 +26,74 @@
   } @else {
   <p>Your cart is empty . . . Keep looking around . . .</p>
   }
+</div> -->
+<div class="container">
+  <h2 class="text-3xl font-bold text-left mb-5">
+    Your Cart | Total: {{ total | currency }}
+  </h2>
+
+  <!-- Check if the cart is not empty -->
+  <div class="cart" *ngIf="cartItems.length > 0; else emptyCart">
+    <table class="table table-xs">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Loop through each item in the cart -->
+        <tr>
+          <td></td>
+        </tr>
+        <tr *ngFor="let item of cartItems">
+          <td>
+            <p>
+              <strong>{{ item.product.name }}</strong>
+            </p>
+            <p>Base Price: {{ item.product.base_price | currency }}</p>
+          </td>
+          <td>
+            <!-- If there are selected options, list them -->
+            @if(item.selected_options.length > 0){
+            <p>
+              <strong>Selected Options:</strong>
+              (
+              <span *ngFor="let option of item.selected_options">
+                {{ option.name }}, </span
+              >)
+            </p>
+
+            } @else {
+            <span><strong>No Selected Options:</strong></span>
+            }
+          </td>
+          <td class="text-right">{{ item.quantity }}</td>
+          <td class="text-right">{{ item.price | currency }}</td>
+          <td class="text-right">
+            {{ item.quantity * item.price | currency }}
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Checkout button -->
+    <button
+      class="bg-blue-500 text-white py-2 px-4 rounded"
+      (click)="checkout()"
+    >
+      Checkout
+    </button>
+  </div>
+
+  <!-- Display message when the cart is empty -->
+  <ng-template #emptyCart>
+    <p>Your cart is empty... Keep looking around...</p>
+  </ng-template>
 </div>
