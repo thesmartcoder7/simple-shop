@@ -25,5 +25,8 @@ langcheck:
 test:
 	@pytest shop/tests.py
 
+db:
+	@touch db.sqlite3
+
 dummy:
 	@python manage.py populate_db
