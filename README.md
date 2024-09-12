@@ -61,3 +61,11 @@ docker-compose down # to stop the application form running.
 If you run into any errors while running these commands, you might need root persmissions in case you installed docker and docker compose with super user.
 
 Keep in mind that the required dependencies for this project are in their respective folders `frontend` i.e `package.json` and `backend` i.e `requirements.txt` . . . but that is why I decided to use Docker to setup the project with the build command and expose both the frontend and the backend.
+
+In case thesefail, you can alway do a manual setup. For testing purposes, you can use the following admin credentials to log into the admin panel.
+
+```bash
+username: samuel
+password: thesmartcoder
+email: samuel@martins.com
+```
