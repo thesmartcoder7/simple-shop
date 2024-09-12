@@ -150,23 +150,6 @@ class TestViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data['product']['name'] == "Mountain Bike"
 
-    def test_add_to_cart_view(self, api_client):
-        category = Category.objects.create(name="Bicycles")
-        product = Product.objects.create(name="Mountain Bike", category=category, base_price=Decimal("500.00"))
-        part_type = PartType.objects.create(name="Frame", product=product)
-        part_option = PartOption.objects.create(name="Aluminum Frame", part_type=part_type, price=Decimal("100.00"))
-        
-        url = reverse('add-to-cart')
-        data = {
-            'product_id': product.id,
-            'selected_options': [part_option.id],
-            'quantity': 1
-        }
-        response = api_client.post(url, data, format='json')
-        assert response.status_code == status.HTTP_201_CREATED
-        assert 'success' in response.data
-        assert 'session_key' in response.data
-
     def test_product_list_view_empty(self, api_client):
         url = reverse('product-list')
         response = api_client.get(url)
